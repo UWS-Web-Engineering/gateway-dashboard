@@ -82,7 +82,8 @@
     @apply px-4;
     @apply container;
     @apply mx-auto;
-    @apply mt-8;
+    @apply py-8;
+    @apply pt-28;
   }
 
   html,

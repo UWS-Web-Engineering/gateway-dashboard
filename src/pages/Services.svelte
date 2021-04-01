@@ -1,5 +1,7 @@
 <script lang="ts">
   import { Link } from "svelte-navigator";
+  import classnames from "classnames";
+
   import axios from "../lib/axios";
   import { services as servicesStore } from "../store";
   import SectionHeader from "../components/SectionHeader.svelte";
@@ -8,6 +10,11 @@
   let loading = true;
 
   let services = [];
+  let healths: Record<number, number> = {};
+
+  axios.get("/services/healths").then(({ data }) => {
+    healths = data;
+  });
 
   axios
     .get("/services")
@@ -41,13 +48,27 @@
             >
               {service.name}
             </div>
-            <div class="text-xs text-gray-500 ml-2">URL: {service.url}</div>
+            <div class="text-xs text-gray-500 ml-2">{service.key}</div>
             <div class="text-sm text-gray-500 flex-1 flex justify-end mr-4">
               STATUS: {#if service.active}
-                <span class="text-green-500 ml-1">Online</span>
+                <span class="text-green-500 ml-1">Active</span>
               {:else}
                 <span class="text-red-500 ml-1">Offline</span>
               {/if}
+            </div>
+            <div class="text-sm flex justify-end mr-4">
+              Health: <span
+                class={classnames("px-1", {
+                  "text-green-500": healths[service.id] > 90,
+                  "text-yellow-500": healths[service.id] >= 70,
+                  "text-red-500": healths[service.id] < 70,
+                })}
+                >{healths[service.id] > 90
+                  ? "Good"
+                  : healths[service.id] >= 70
+                  ? "Ok"
+                  : "Bad"}</span
+              >
             </div>
             <div>
               <svg

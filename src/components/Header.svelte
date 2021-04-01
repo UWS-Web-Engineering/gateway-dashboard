@@ -53,7 +53,7 @@
   };
 </script>
 
-<nav class="bg-white shadow">
+<nav class="bg-white shadow fixed top-0 left-0 w-full z-20">
   <div class="container mx-auto px-4 h-20 flex flex-col justify-center">
     <div class="flex justify-between h-full">
       <div class="flex">
@@ -102,16 +102,7 @@
           </button>
         </div>
         <div class="flex-shrink-0 flex items-center">
-          <img
-            class="block lg:hidden h-8 w-auto"
-            src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-            alt="Workflow"
-          />
-          <img
-            class="hidden lg:block h-8 w-auto"
-            src="https://tailwindui.com/img/logos/workflow-logo-indigo-600-mark-gray-800-text.svg"
-            alt="Workflow"
-          />
+          <img class="h-12 w-auto" src="/api_gateway_logo.svg" alt="Workflow" />
         </div>
         <div class="hidden md:ml-6 md:flex md:space-x-8">
           {#each Object.entries(ROUTES).filter(([_, r]) =>

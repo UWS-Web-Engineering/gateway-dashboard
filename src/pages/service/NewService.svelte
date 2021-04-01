@@ -1,5 +1,6 @@
 <script lang="ts">
   import { navigate } from "svelte-navigator";
+  import friendlyUrl from "friendly-url";
 
   import SectionHeader from "./../../components/SectionHeader.svelte";
   import Input from "./../../components/Input.svelte";
@@ -7,9 +8,15 @@
   import Toggle from "./../../components/Toggle.svelte";
   import axios from "./../../lib/axios";
 
-  let name = "";
-  let url = "";
   let active = true;
+  let name = "";
+  let description = "";
+  let key = "";
+  let secure = true;
+  let domain = "";
+  let port = "";
+  let path = "";
+
   let error = false;
   let loading = false;
 
@@ -17,36 +24,99 @@
     event.preventDefault();
 
     await axios.post("/service", {
-      name: encodeURIComponent(name.toLocaleLowerCase()),
-      url,
       active,
+      name,
+      description,
+      key,
+      secure,
+      domain,
+      port,
+      path,
     });
     navigate("/services");
+  }
+
+  function handleKeyChange(event: Event) {
+    key = friendlyUrl((event.target as any).value);
+  }
+
+  function handleNameChange(event: Event) {
+    if (key !== "") {
+      return;
+    }
+    key = friendlyUrl((event.target as any).value);
   }
 </script>
 
 <main>
-  <SectionHeader title="New service" />
-  <form class="mt-8 space-y-6" on:submit={handleSubmit}>
+  <form class="space-y-6" on:submit={handleSubmit}>
     <div>
-      <div class="space-y-4">
+      <SectionHeader title="Service details" />
+      <div class="space-y-4 mt-4">
+        <Toggle label="Active" bind:value={active} />
         <Input
           id="name"
           name="name"
           type="text"
           label="Name"
-          placeholder="my-service"
+          placeholder="My Service"
+          on:change={handleNameChange}
           bind:value={name}
         />
         <Input
-          id="url"
-          name="url"
+          id="description"
+          name="description"
           type="text"
-          label="Url"
-          placeholder="192.168.1.1:8080"
-          bind:value={url}
+          label="Description"
+          bind:value={description}
         />
-        <Toggle label="Active" bind:value={active} />
+        <Input
+          id="key"
+          name="key"
+          type="text"
+          label="Key"
+          placeholder="my-service"
+          description={key && process.env.API_URL + "/gateway/" + key}
+          on:change={handleKeyChange}
+          bind:value={key}
+        />
+      </div>
+
+      <SectionHeader title="Service target" className="mt-8" />
+      <div class="space-y-4 mt-4">
+        <Toggle label="Secured (Https)" bind:value={secure} />
+        <Input
+          id="domain"
+          name="domain"
+          type="text"
+          label="Domain"
+          placeholder="mydomain.com"
+          prefix={secure ? "https://" : "http://"}
+          bind:value={domain}
+        />
+        <Input
+          id="port"
+          name="port"
+          type="text"
+          label="Port"
+          placeholder="443"
+          prefix={(secure ? "https://" : "http://") +
+            (domain || "mydomain.com") +
+            ":"}
+          bind:value={port}
+        />
+        <Input
+          id="path"
+          name="path"
+          type="text"
+          label="Path"
+          placeholder="/api/v1"
+          prefix={(secure ? "https://" : "http://") +
+            (domain || "mydomain.com") +
+            ":" +
+            (port || "443")}
+          bind:value={path}
+        />
       </div>
       {#if error}
         <p class="mt-2 text-sm text-red-600" id="email-error">
