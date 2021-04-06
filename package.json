@@ -5,7 +5,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --no-clear -s -p $PORT",
+    "start": "sirv public --no-clear -s -p 3000",
     "prepare": "husky install",
     "validate": "svelte-check"
   },
