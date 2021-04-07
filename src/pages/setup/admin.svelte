@@ -21,7 +21,7 @@
         password,
       });
 
-      window.location.href = "/user/login";
+      window.location.href = "/";
     } catch {
       error = true;
     } finally {
