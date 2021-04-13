@@ -6,6 +6,7 @@
   import SectionHeader from "../../components/SectionHeader.svelte";
   import Spinner from "../../components/Spinner.svelte";
   import Button from "../../components/Button.svelte";
+  import StatisticsCard from "../../components/StatisticsCard.svelte";
 
   const params = useParams();
 
@@ -15,9 +16,20 @@
   let service;
   let target = "";
   let gateway = "";
-  let paths = [];
+  let requests: Record<string, number> = {};
+  let success: Record<string, number> = {};
+  let responseTime: Record<string, number> = {};
 
-  axios.get(`/services/healths`);
+  axios
+    .get(`/health/requests/${$params.id}`)
+    .then(({ data }) => (requests = data));
+  axios
+    .get(`/health/success/${$params.id}`)
+    .then(({ data }) => (success = data));
+  axios
+    .get(`/health/responseTime/${$params.id}`)
+    .then(({ data }) => (responseTime = data));
+
   axios
     .get(`/service/${$params.id}`)
     .then(({ data }) => {
@@ -29,8 +41,41 @@
     })
     .finally(() => (loading = false));
 
-  axios.get(`/service/${$params.id}/paths`).then(({ data }) => {
-    paths = data;
+  axios.get(`/health/chart/${$params.id}`).then(({ data }) => {
+    // @ts-ignore
+    new Chart(document.getElementById("myChart").getContext("2d"), {
+      type: "line",
+      data: {
+        labels: Object.keys(data.total).reverse(),
+        datasets: [
+          {
+            label: "Requests",
+            backgroundColor: "#A5B4FC",
+            borderColor: "#6366F1",
+            data: Object.values(data.total).reverse(),
+          },
+        ],
+      },
+
+      // Configuration options go here
+      options: {
+        scales: {
+          yAxes: [
+            {
+              stacked: true,
+              ticks: {
+                beginAtZero: true,
+                callback: function (value) {
+                  if (value % 1 === 0) {
+                    return value;
+                  }
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
   });
 
   async function handleDelete() {
@@ -69,7 +114,9 @@
   {:else}
     <div class="flex space-x-4">
       <div class="flex flex-col space-y-4 py-4">
-        <div class="text-md">Details</div>
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Service Information
+        </h3>
         <div>
           <div class="capitalize mr-2 text-gray-500 text-sm">Status:</div>
           <div
@@ -122,67 +169,28 @@
         </div>
       </div>
 
-      <div class="flex-1 border-l pl-4">
-        <div class="text-md py-2">Paths</div>
-        <div
-          class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"
-        >
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Method
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Path
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Private
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              {#each paths as path}
-                <tr>
-                  <td
-                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                  >
-                    {path.method}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {path.path}
-                  </td>
-                  <td
-                    class={classnames("px-6 py-4 whitespace-nowrap text-sm", {
-                      "text-green-500": path.requireAuth,
-                      "text-red-500": !path.requireAuth,
-                    })}
-                  >
-                    {path.requireAuth ? "True" : "False"}
-                  </td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-          <nav
-            class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-            aria-label="Pagination"
+      <div class="flex-1 border-l pl-4 flex flex-col">
+        <div class="mt-4">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
+            Last 7 days
+          </h3>
+          <dl
+            class="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow divide-y divide-gray-200 md:grid-cols-3 md:divide-y-0 md:divide-x"
           >
-            <div class="hidden sm:block">
-              <p class="text-sm text-gray-400">
-                Paths are automatically added to this list as they are called
-              </p>
-            </div>
-          </nav>
+            <StatisticsCard title="Number of Requests" value={requests} />
+            <StatisticsCard title="Success Rate" value={success} />
+            <StatisticsCard title="Avg. Response Time" value={responseTime} />
+          </dl>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
+            Number of Request in the last 14 days
+          </h3>
+          <div
+            class="mt-5 rounded-lg bg-white overflow-hidden shadow flex-grow p-2"
+          >
+            <canvas id="myChart" />
+          </div>
         </div>
       </div>
     </div>

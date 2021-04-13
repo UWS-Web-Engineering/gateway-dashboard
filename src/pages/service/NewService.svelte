@@ -12,10 +12,7 @@
   let name = "";
   let description = "";
   let key = "";
-  let secure = true;
-  let domain = "";
-  let port = "";
-  let path = "";
+  let url = "";
 
   let error = false;
   let loading = false;
@@ -28,10 +25,7 @@
       name,
       description,
       key,
-      secure,
-      domain,
-      port,
-      path,
+      url,
     });
     navigate("/services");
   }
@@ -84,38 +78,13 @@
 
       <SectionHeader title="Service target" className="mt-8" />
       <div class="space-y-4 mt-4">
-        <Toggle label="Secured (Https)" bind:value={secure} />
         <Input
-          id="domain"
-          name="domain"
+          id="url"
+          name="url"
           type="text"
-          label="Domain"
-          placeholder="mydomain.com"
-          prefix={secure ? "https://" : "http://"}
-          bind:value={domain}
-        />
-        <Input
-          id="port"
-          name="port"
-          type="text"
-          label="Port"
-          placeholder="443"
-          prefix={(secure ? "https://" : "http://") +
-            (domain || "mydomain.com") +
-            ":"}
-          bind:value={port}
-        />
-        <Input
-          id="path"
-          name="path"
-          type="text"
-          label="Path"
-          placeholder="/api/v1"
-          prefix={(secure ? "https://" : "http://") +
-            (domain || "mydomain.com") +
-            ":" +
-            (port || "443")}
-          bind:value={path}
+          label="Url"
+          placeholder="https://mydomain.com/api"
+          bind:value={url}
         />
       </div>
       {#if error}

@@ -48,7 +48,9 @@
             >
               {service.name}
             </div>
-            <div class="text-xs text-gray-500 ml-2">{service.key}</div>
+            <div class="text-xs text-gray-500 ml-2">
+              {process.env.API_URL}/gateway/{service.key}
+            </div>
             <div class="text-sm text-gray-500 flex-1 flex justify-end mr-4">
               STATUS: {#if service.active}
                 <span class="text-green-500 ml-1">Active</span>
@@ -59,8 +61,9 @@
             <div class="text-sm flex justify-end mr-4">
               Health: <span
                 class={classnames("px-1", {
-                  "text-green-500": healths[service.id] > 90,
-                  "text-yellow-500": healths[service.id] >= 70,
+                  "text-green-500": healths[service.id] >= 90,
+                  "text-yellow-500":
+                    healths[service.id] >= 70 && healths[service.id] < 90,
                   "text-red-500": healths[service.id] < 70,
                 })}
                 >{healths[service.id] > 90
