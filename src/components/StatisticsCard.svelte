@@ -1,19 +1,22 @@
 <script lang="ts">
   export let title: string;
   export let value: Record<string, number>;
+  export let prefix: string = "";
+  export let suffix: string = "";
+  export let reverseStatus: boolean = false;
 </script>
 
 <div class="px-4 py-5 sm:p-6">
   <dt class="text-base font-normal text-gray-900">{title}</dt>
   <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
     <div class="flex items-baseline text-2xl font-semibold text-indigo-140">
-      {value["7days"]}
+      {prefix}{value["7days"]}{suffix}
       <span class="ml-2 text-sm font-medium text-gray-500">
-        from {value["14days"]}
+        from {prefix}{value["14days"]}{suffix}
       </span>
     </div>
 
-    {#if value["7days"] > value["14days"]}
+    {#if (!reverseStatus && value["7days"] > value["14days"]) || (reverseStatus && value["7days"] < value["14days"])}
       <div
         class="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800 md:mt-2 lg:mt-0"
       >

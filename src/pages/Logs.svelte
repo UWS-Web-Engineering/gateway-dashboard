@@ -113,7 +113,7 @@
                       class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-500"
                     >
                       <Link to={`/service/${log.serviceId}`}>
-                        {services[log.serviceId]?.name}
+                        {services && services[log.serviceId]?.name}
                       </Link>
                     </td>
                     <td

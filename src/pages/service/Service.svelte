@@ -20,63 +20,63 @@
   let success: Record<string, number> = {};
   let responseTime: Record<string, number> = {};
 
-  axios
-    .get(`/health/requests/${$params.id}`)
-    .then(({ data }) => (requests = data));
-  axios
-    .get(`/health/success/${$params.id}`)
-    .then(({ data }) => (success = data));
-  axios
-    .get(`/health/responseTime/${$params.id}`)
-    .then(({ data }) => (responseTime = data));
-
-  axios
-    .get(`/service/${$params.id}`)
-    .then(({ data }) => {
+  Promise.all([
+    axios
+      .get(`/health/requests/${$params.id}`)
+      .then(({ data }) => (requests = data)),
+    axios
+      .get(`/health/success/${$params.id}`)
+      .then(({ data }) => (success = data)),
+    axios
+      .get(`/health/responseTime/${$params.id}`)
+      .then(({ data }) => (responseTime = data)),
+    axios.get(`/service/${$params.id}`).then(({ data }) => {
       service = data;
       target = `${service.secure ? "https://" : "http://"}${service.domain}:${
         service.port
       }${service.path}`;
       gateway = `${process.env.API_URL}/gateway/${service.key}`;
-    })
-    .finally(() => (loading = false));
-
-  axios.get(`/health/chart/${$params.id}`).then(({ data }) => {
-    // @ts-ignore
-    new Chart(document.getElementById("myChart").getContext("2d"), {
-      type: "line",
-      data: {
-        labels: Object.keys(data.total).reverse(),
-        datasets: [
-          {
-            label: "Requests",
-            backgroundColor: "#A5B4FC",
-            borderColor: "#6366F1",
-            data: Object.values(data.total).reverse(),
-          },
-        ],
-      },
-
-      // Configuration options go here
-      options: {
-        scales: {
-          yAxes: [
-            {
-              stacked: true,
-              ticks: {
-                beginAtZero: true,
-                callback: function (value) {
-                  if (value % 1 === 0) {
-                    return value;
-                  }
-                },
+    }),
+  ])
+    .then(() =>
+      axios.get(`/health/chart/${$params.id}`).then(({ data }) => {
+        // @ts-ignore
+        new Chart(document.getElementById("myChart").getContext("2d"), {
+          type: "line",
+          data: {
+            labels: Object.keys(data.total).reverse(),
+            datasets: [
+              {
+                label: "Requests",
+                backgroundColor: "#A5B4FC",
+                borderColor: "#6366F1",
+                data: Object.values(data.total).reverse(),
               },
+            ],
+          },
+
+          // Configuration options go here
+          options: {
+            scales: {
+              yAxes: [
+                {
+                  stacked: true,
+                  ticks: {
+                    beginAtZero: true,
+                    callback: function (value) {
+                      if (value % 1 === 0) {
+                        return value;
+                      }
+                    },
+                  },
+                },
+              ],
             },
-          ],
-        },
-      },
-    });
-  });
+          },
+        });
+      })
+    )
+    .finally(() => (loading = false));
 
   async function handleDelete() {
     deleting = true;
@@ -175,11 +175,16 @@
             Last 7 days
           </h3>
           <dl
-            class="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow divide-y divide-gray-200 md:grid-cols-3 md:divide-y-0 md:divide-x"
+            class="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow divide-y divide-gray-200"
           >
             <StatisticsCard title="Number of Requests" value={requests} />
-            <StatisticsCard title="Success Rate" value={success} />
-            <StatisticsCard title="Avg. Response Time" value={responseTime} />
+            <StatisticsCard title="Success Rate" value={success} suffix="%" />
+            <StatisticsCard
+              title="Avg. Response Time"
+              value={responseTime}
+              suffix=" ms"
+              reverseStatus
+            />
           </dl>
         </div>
         <div class="mt-4">
