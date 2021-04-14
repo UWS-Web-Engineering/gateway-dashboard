@@ -32,10 +32,8 @@
       .then(({ data }) => (responseTime = data)),
     axios.get(`/service/${$params.id}`).then(({ data }) => {
       service = data;
-      target = `${service.secure ? "https://" : "http://"}${service.domain}:${
-        service.port
-      }${service.path}`;
-      gateway = `${process.env.API_URL}/gateway/${service.key}`;
+      target = `${service.url}`;
+      gateway = `${process.env.API_URL}/${service.key}`;
     }),
   ])
     .then(() =>
@@ -94,9 +92,7 @@
       })
       .then(({ data }) => {
         service = data;
-        target = `${service.secure ? "https://" : "http://"}${service.domain}:${
-          service.port
-        }${service.path}`;
+        target = `${service.url}`;
         gateway = `${process.env.API_URL}/${service.key}`;
       });
     updating = false;
