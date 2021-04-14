@@ -49,7 +49,7 @@
               {service.name}
             </div>
             <div class="text-xs text-gray-500 ml-2">
-              {process.env.API_URL}/gateway/{service.key}
+              {process.env.API_URL}/{service.key}
             </div>
             <div class="text-sm text-gray-500 flex-1 flex justify-end mr-4">
               STATUS: {#if service.active}

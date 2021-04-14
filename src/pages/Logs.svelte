@@ -23,12 +23,22 @@
   let services = {};
 
   function load(url) {
-    axios
-      .get(url)
-      .then(({ data }) => {
+    Promise.all([
+      axios.get(url).then(({ data }) => {
         logs = data;
-      })
-      .finally(() => (loading = false));
+      }),
+      axios.get("/services").then(({ data }) => {
+        let _services = {};
+        data.forEach((item) => {
+          _services = {
+            ..._services,
+            [item.id]: item,
+          };
+        });
+        services = _services;
+      }),
+    ])
+    .finally(() => (loading = false));
   }
 
   let url = "/logs";
@@ -37,20 +47,6 @@
   }
 
   load(url);
-
-  axios
-    .get("/services")
-    .then(({ data }) => {
-      let _services = {};
-      data.forEach((item) => {
-        _services = {
-          ..._services,
-          [item.id]: item,
-        };
-      });
-      services = _services;
-    })
-    .finally(() => (loading = false));
 </script>
 
 <main>

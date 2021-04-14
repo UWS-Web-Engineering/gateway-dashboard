@@ -97,7 +97,7 @@
         target = `${service.secure ? "https://" : "http://"}${service.domain}:${
           service.port
         }${service.path}`;
-        gateway = `${process.env.API_URL}/gateway/${service.key}`;
+        gateway = `${process.env.API_URL}/${service.key}`;
       });
     updating = false;
   }
