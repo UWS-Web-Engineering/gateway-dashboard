@@ -20,6 +20,58 @@
   let success: Record<string, number> = {};
   let responseTime: Record<string, number> = {};
 
+  function getCharElm() {
+    return new Promise((resolve) => {
+      const elm = document.getElementById("myChart");
+      if (!elm) {
+        setTimeout(() => {
+          resolve(getCharElm());
+        }, 100);
+        return;
+      }
+
+      // @ts-ignore
+      resolve(elm.getContext("2d"));
+    });
+  }
+
+  async function loadChart(data: any) {
+    // @ts-ignore
+    new Chart(await getCharElm(), {
+      type: "line",
+      data: {
+        labels: Object.keys(data.total).reverse(),
+        datasets: [
+          {
+            label: "Requests",
+            backgroundColor: "#A5B4FC",
+            borderColor: "#6366F1",
+            data: Object.values(data.total).reverse(),
+          },
+        ],
+      },
+
+      // Configuration options go here
+      options: {
+        scales: {
+          yAxes: [
+            {
+              stacked: true,
+              ticks: {
+                beginAtZero: true,
+                callback: function (value) {
+                  if (value % 1 === 0) {
+                    return value;
+                  }
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
+  }
+
   Promise.all([
     axios
       .get(`/health/requests/${$params.id}`)
@@ -38,40 +90,7 @@
   ])
     .then(() =>
       axios.get(`/health/chart/${$params.id}`).then(({ data }) => {
-        // @ts-ignore
-        new Chart(document.getElementById("myChart").getContext("2d"), {
-          type: "line",
-          data: {
-            labels: Object.keys(data.total).reverse(),
-            datasets: [
-              {
-                label: "Requests",
-                backgroundColor: "#A5B4FC",
-                borderColor: "#6366F1",
-                data: Object.values(data.total).reverse(),
-              },
-            ],
-          },
-
-          // Configuration options go here
-          options: {
-            scales: {
-              yAxes: [
-                {
-                  stacked: true,
-                  ticks: {
-                    beginAtZero: true,
-                    callback: function (value) {
-                      if (value % 1 === 0) {
-                        return value;
-                      }
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        });
+        loadChart(data);
       })
     )
     .finally(() => (loading = false));
