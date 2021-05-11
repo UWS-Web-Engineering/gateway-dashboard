@@ -9,12 +9,14 @@
 <div class="px-4 py-5 sm:p-6">
   <dt class="text-base font-normal text-gray-900">{title}</dt>
   <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
-    <div class="flex items-baseline text-2xl font-semibold text-indigo-140">
-      {prefix}{value["7days"]}{suffix}
-      <span class="ml-2 text-sm font-medium text-gray-500">
-        from {prefix}{value["14days"]}{suffix}
-      </span>
-    </div>
+    {#if value["7days"] !== undefined}
+      <div class="flex items-baseline text-2xl font-semibold text-indigo-140">
+        {prefix}{Math.round(value["7days"])}{suffix}
+        <span class="ml-2 text-sm font-medium text-gray-500">
+          from {prefix}{Math.round(value["14days"])}{suffix}
+        </span>
+      </div>
+    {/if}
 
     {#if (!reverseStatus && value["7days"] > value["14days"]) || (reverseStatus && value["7days"] < value["14days"])}
       <div
@@ -36,8 +38,10 @@
         {#if value["14days"] === 0}
           100%
         {:else}
-          {Math.abs(
-            ((value["7days"] - value["14days"]) / value["14days"]) * 100
+          {Math.round(
+            Math.abs(
+              ((value["7days"] - value["14days"]) / value["14days"]) * 100
+            )
           )}%
         {/if}
       </div>
@@ -67,8 +71,10 @@
         {#if value["14days"] === 0}
           100%
         {:else}
-          {Math.abs(
-            ((value["7days"] - value["14days"]) / value["14days"]) * 100
+          {Math.round(
+            Math.abs(
+              ((value["7days"] - value["14days"]) / value["14days"]) * 100
+            )
           )}%
         {/if}
       </div>

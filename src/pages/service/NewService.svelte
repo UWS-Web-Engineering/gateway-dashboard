@@ -70,7 +70,7 @@
           type="text"
           label="Key"
           placeholder="my-service"
-          description={key && process.env.API_URL + "/gateway/" + key}
+          description={key && process.env.API_URL + "/" + key}
           on:change={handleKeyChange}
           bind:value={key}
         />
