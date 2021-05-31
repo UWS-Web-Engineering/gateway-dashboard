@@ -13,6 +13,7 @@
   let description = "";
   let key = "";
   let url = "";
+  let privateService = true;
 
   let error = false;
   let loading = false;
@@ -26,6 +27,7 @@
       description,
       key,
       url,
+      private: privateService,
     });
     navigate("/services");
   }
@@ -40,6 +42,7 @@
     }
     key = friendlyUrl((event.target as any).value);
   }
+
 </script>
 
 <main>
@@ -48,6 +51,7 @@
       <SectionHeader title="Service details" />
       <div class="space-y-4 mt-4">
         <Toggle label="Active" bind:value={active} />
+        <Toggle label="Private" bind:value={privateService} />
         <Input
           id="name"
           name="name"
