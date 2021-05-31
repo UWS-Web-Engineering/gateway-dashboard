@@ -122,7 +122,7 @@
     await axios
       .put(`/service/${$params.id}`, {
         ...service,
-        active: !service.active,
+        private: !service.private,
       })
       .then(({ data }) => {
         service = data;
