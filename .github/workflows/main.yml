@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: iconic21/gateway-api:latest
+          tags: iconic21/gateway-dashbaord:latest
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
