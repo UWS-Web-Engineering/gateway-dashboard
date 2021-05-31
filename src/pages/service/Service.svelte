@@ -116,6 +116,22 @@
       });
     updating = false;
   }
+
+  async function handlePrivateToggle() {
+    updating = true;
+    await axios
+      .put(`/service/${$params.id}`, {
+        ...service,
+        active: !service.active,
+      })
+      .then(({ data }) => {
+        service = data;
+        target = `${service.url}`;
+        gateway = `${process.env.API_URL}/${service.key}`;
+      });
+    updating = false;
+  }
+
 </script>
 
 <main>
@@ -173,6 +189,12 @@
             className="w-atuo"
             loading={updating}
             on:click={handleStatusToggle}
+          />
+          <Button
+            text={service.private ? "Make public" : "Make private"}
+            className="w-atuo"
+            loading={updating}
+            on:click={handlePrivateToggle}
           />
           <Button
             text="Delete service"
